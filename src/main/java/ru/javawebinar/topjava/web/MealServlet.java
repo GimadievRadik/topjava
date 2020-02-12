@@ -28,8 +28,8 @@ public class MealServlet extends HttpServlet {
     DateTimeFormatter servletFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
     DateTimeFormatter jspFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm");
 
-    public MealServlet() {
-        super();
+    @Override
+    public void init() throws ServletException {
         log.debug("Constructor, get dao object");
         dao = new MealDaoMemoryImpl();
     }
@@ -41,31 +41,40 @@ public class MealServlet extends HttpServlet {
         log.debug("Action = {}", action);
 
         String forward;
-        if (action.equalsIgnoreCase("delete")) {
-            int id = Integer.parseInt(request.getParameter("id"));
-            log.debug("Delete meal id = {}", id);
-            dao.delete(id);
-            forward = LIST_MEAL;
-            request.setAttribute("mealsTo", MealsUtil.filteredByStreams(dao.getAll(), LocalTime.MIN, LocalTime.MAX, 2000));
-            request.setAttribute("jspFormatter", jspFormatter);
-        } else if (action.equalsIgnoreCase("edit")) {
-            forward = INSERT_OR_EDIT;
-            int id = Integer.parseInt(request.getParameter("id"));
-            log.debug("Receive meal id = {}", id);
-            Meal meal = dao.getById(id);
-            request.setAttribute("meal", meal);
-        } else if (action.equalsIgnoreCase("listMeal")) {
-            forward = LIST_MEAL;
-            log.debug("Put all MealTo objects to request attribute");
-            request.setAttribute("mealsTo", MealsUtil.filteredByStreams(dao.getAll(), LocalTime.MIN, LocalTime.MAX, 2000));
-            request.setAttribute("jspFormatter", jspFormatter);
-        } else {
-            forward = INSERT_OR_EDIT;
+        int id;
+        RequestDispatcher dispatcher;
+        switch (action) {
+            case "listMeal":
+                forward = LIST_MEAL;
+                log.debug("Put all MealTo objects to request attribute");
+                request.setAttribute("mealsTo", MealsUtil.filteredByStreams(dao.getAll(), LocalTime.MIN, LocalTime.MAX, 2000));
+                request.setAttribute("jspFormatter", jspFormatter);
+                dispatcher = request.getRequestDispatcher(forward);
+                log.debug("Forward to {}", forward);
+                dispatcher.forward(request, response);
+                break;
+            case "delete":
+                id = Integer.parseInt(request.getParameter("id"));
+                log.debug("Delete meal id = {}", id);
+                dao.delete(id);
+                response.sendRedirect(request.getContextPath() + "/meals");
+                break;
+            case "edit":
+                forward = INSERT_OR_EDIT;
+                id = Integer.parseInt(request.getParameter("id"));
+                log.debug("Receive meal id = {}", id);
+                Meal meal = dao.getById(id);
+                request.setAttribute("meal", meal);
+                dispatcher = request.getRequestDispatcher(forward);
+                log.debug("Forward to {}", forward);
+                dispatcher.forward(request, response);
+                break;
+            default:
+                forward = INSERT_OR_EDIT;
+                dispatcher = request.getRequestDispatcher(forward);
+                log.debug("Forward to {}", forward);
+                dispatcher.forward(request, response);
         }
-
-        RequestDispatcher dispatcher = request.getRequestDispatcher(forward);
-        log.debug("End of doGet method");
-        dispatcher.forward(request, response);
     }
 
     @Override
@@ -86,11 +95,7 @@ public class MealServlet extends HttpServlet {
             log.debug("Update meal, id = {}", meal.getId());
             dao.update(meal);
         }
-
-        RequestDispatcher dispatcher = request.getRequestDispatcher(LIST_MEAL);
-        request.setAttribute("mealsTo", MealsUtil.filteredByStreams(dao.getAll(), LocalTime.MIN, LocalTime.MAX, 2000));
-        request.setAttribute("jspFormatter", jspFormatter);
         log.debug("End of doPost method");
-        dispatcher.forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/meals");
     }
 }
