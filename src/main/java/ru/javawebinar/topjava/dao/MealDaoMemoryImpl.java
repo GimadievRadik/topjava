@@ -11,10 +11,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MealDaoMemoryImpl implements MealDao {
-    private static ConcurrentHashMap<Integer, Meal> mealsDB = new ConcurrentHashMap<>();
-    private static AtomicInteger index = new AtomicInteger(0);
+    private ConcurrentHashMap<Integer, Meal> mealsdb = new ConcurrentHashMap<>();
+    private AtomicInteger index = new AtomicInteger(0);
 
-    static {
+    public MealDaoMemoryImpl() {
         List<Meal> meals = Arrays.asList(
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
@@ -23,32 +23,34 @@ public class MealDaoMemoryImpl implements MealDao {
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000),
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500),
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410));
-        meals.forEach(meal -> new MealDaoMemoryImpl().add(meal));
+        meals.forEach(this::add);
     }
 
     @Override
     public void add(Meal meal) {
         meal.setId(index.incrementAndGet());
-        mealsDB.put(meal.getId(), meal);
+        mealsdb.put(meal.getId(), meal);
     }
 
     @Override
     public void delete(int id) {
-        mealsDB.remove(id);
+        mealsdb.remove(id);
     }
 
     @Override
     public void update(Meal meal) {
-        mealsDB.put(meal.getId(), meal);
+        if (mealsdb.containsKey(meal.getId())) {
+            mealsdb.put(meal.getId(), meal);
+        }
     }
 
     @Override
     public List<Meal> getAll() {
-        return new ArrayList<>(mealsDB.values());
+        return new ArrayList<>(mealsdb.values());
     }
 
     @Override
     public Meal getById(int id) {
-        return mealsDB.get(id);
+        return mealsdb.get(id);
     }
 }

@@ -40,21 +40,18 @@ public class MealServlet extends HttpServlet {
         String action = request.getParameter("action") == null ? "listMeal" : request.getParameter("action");
         log.debug("Action = {}", action);
 
-        String forward;
-        int id;
-        RequestDispatcher dispatcher;
         switch (action) {
             case "listMeal":
-                forward = LIST_MEAL;
+                String forward = LIST_MEAL;
                 log.debug("Put all MealTo objects to request attribute");
                 request.setAttribute("mealsTo", MealsUtil.filteredByStreams(dao.getAll(), LocalTime.MIN, LocalTime.MAX, 2000));
                 request.setAttribute("jspFormatter", jspFormatter);
-                dispatcher = request.getRequestDispatcher(forward);
+                RequestDispatcher dispatcher = request.getRequestDispatcher(forward);
                 log.debug("Forward to {}", forward);
                 dispatcher.forward(request, response);
                 break;
             case "delete":
-                id = Integer.parseInt(request.getParameter("id"));
+                int id = Integer.parseInt(request.getParameter("id"));
                 log.debug("Delete meal id = {}", id);
                 dao.delete(id);
                 response.sendRedirect(request.getContextPath() + "/meals");
