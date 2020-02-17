@@ -4,10 +4,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <bean class="ru.javawebinar.topjava.repository.inmemory.InMemoryMealRepository" id="mealRepository" />
-    <bean class="ru.javawebinar.topjava.service.MealService">
-        <constructor-arg name="repository" ref="mealRepository"/>
-    </bean>
+<!--    <bean class="ru.javawebinar.topjava.repository.inmemory.InMemoryMealRepository" id="mealRepository" />-->
+<!--    <bean class="ru.javawebinar.topjava.service.MealService">-->
+<!--        <constructor-arg name="repository" ref="mealRepository"/>-->
+<!--    </bean>-->
 
     <!--
         <bean class="ru.javawebinar.topjava.repository.inmemory.InMemoryUserRepository" id="inmemoryUserRepository"/>
@@ -20,10 +20,10 @@
     <!-- Not necessary, already included with component-scan -->
 <!--    <context:annotation-config/>-->
 
-<!--    <context:component-scan base-package="ru.javawebinar.**.repository"/>-->
+    <context:component-scan base-package="ru.javawebinar.**.repository"/>
 
-<!--    <context:component-scan base-package="ru.javawebinar.**.service"/>-->
+    <context:component-scan base-package="ru.javawebinar.**.service"/>
 
-<!--    <context:component-scan base-package="ru.javawebinar.**.web"/>-->
+    <context:component-scan base-package="ru.javawebinar.**.web"/>
 
 </beans>
