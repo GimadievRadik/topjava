@@ -41,8 +41,9 @@ public class InMemoryMealRepository implements MealRepository {
             repository.put(meal.getId(), meal);
             return meal;
         }
-        if (meal.getUserId() == userId) {
+        if (isUsersMeal(meal.getId(), userId)) {
             // handle case: update, but not present in storage
+            meal.setUserId(userId);
             return repository.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
         }
         return null;
@@ -50,7 +51,7 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public boolean delete(int id, int userId) {
-        if (repository.containsKey(id) && repository.get(id).getUserId() == userId) {
+        if (isUsersMeal(id, userId)) {
             repository.remove(id);
             return true;
         }
@@ -59,7 +60,7 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        if (repository.containsKey(id) && repository.get(id).getUserId() == userId) {
+        if (isUsersMeal(id, userId)) {
             return repository.get(id);
         }
         return null;
@@ -81,5 +82,9 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     Comparator<Meal> dateTimeComparator = (m1, m2) -> m2.getDateTime().compareTo(m1.getDateTime());
+
+    private boolean isUsersMeal(int mealId, int userId) { // the hint about bank card :)
+        return repository.containsKey(mealId) && repository.get(mealId).getUserId() == userId;
+    }
 }
 

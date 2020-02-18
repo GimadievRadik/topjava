@@ -20,6 +20,8 @@ public class SpringMain {
             System.out.println();
             controller.getAllFiltered(null, null, null, LocalTime.of(10, 0))
                     .forEach(System.out::println);
+            System.out.println();
+            System.out.println(controller.get(100));
         }
     }
 }
