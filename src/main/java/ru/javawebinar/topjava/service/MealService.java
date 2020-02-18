@@ -44,8 +44,8 @@ public class MealService {
     }
 
     public List<MealTo> getAllFiltered(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime, int userId, int caloriesPerDay) {
-         return MealsUtil.getTos(repository.getDateFiltered(startDate, endDate, userId), caloriesPerDay).stream()
-                 .filter(mealTo -> DateTimeUtil.isBetween(mealTo.getTime(), startTime, endTime))
-                 .collect(Collectors.toList());
+        return MealsUtil.getTos(repository.getDateFiltered(startDate, endDate, userId), caloriesPerDay).stream()
+                .filter(mealTo -> DateTimeUtil.isBetween(mealTo.getTime(), startTime, endTime))
+                .collect(Collectors.toList());
     }
 }
