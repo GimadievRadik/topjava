@@ -54,13 +54,7 @@ public class InMemoryUserRepository implements UserRepository {
     public List<User> getAll() {
         log.info("getAll");
         List<User> allUsers = new ArrayList<>(repository.values());
-        Comparator<User> comparator = (u1, u2) -> {
-            if (u1.getName().compareTo(u2.getName()) == 0) {
-                return u1.getEmail().compareTo(u2.getEmail());
-            }
-            return u1.getName().compareTo(u2.getName());
-        };
-        allUsers.sort(comparator);
+        allUsers.sort(Comparator.comparing(User::getName).thenComparing(User::getEmail));
         return allUsers;
     }
 
@@ -69,6 +63,7 @@ public class InMemoryUserRepository implements UserRepository {
         log.info("getByEmail {}", email);
         List<User> users = repository.values().stream()
                 .filter(user -> user.getEmail().equalsIgnoreCase(email))
+                .limit(1)
                 .collect(Collectors.toList());
         return users.isEmpty() ? null : users.get(0);
     }

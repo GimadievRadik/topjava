@@ -51,14 +51,37 @@ public class MealServlet extends HttpServlet {
         log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
         if (meal.isNew()) {
             mealController.create(meal);
-        }
-        mealController.update(meal, meal.getId());
+        } else mealController.update(meal, meal.getId());
         response.sendRedirect("meals");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
+
+        String leftDate = request.getParameter("startDate");
+        LocalDate startDate = null;
+        if (leftDate != null && !leftDate.equals("")) {
+            startDate = LocalDate.parse(leftDate, DateTimeFormatter.ISO_LOCAL_DATE);
+        }
+
+        String rightDate = request.getParameter("endDate");
+        LocalDate endDate = null;
+        if (rightDate != null && !rightDate.equals("")) {
+            endDate = LocalDate.parse(rightDate, DateTimeFormatter.ISO_LOCAL_DATE);
+        }
+
+        String leftTime = request.getParameter("startTime");
+        LocalTime startTime = null;
+        if (leftTime != null && !leftTime.equals("")) {
+            startTime = LocalTime.parse(leftTime, DateTimeFormatter.ofPattern("HH:mm"));
+        }
+
+        String rightTime = request.getParameter("endTime");
+        LocalTime endTime = null;
+        if (rightTime != null && !rightTime.equals("")) {
+            endTime = LocalTime.parse(rightTime, DateTimeFormatter.ofPattern("HH:mm"));
+        }
 
         switch (action == null ? "all" : action) {
             case "delete":
@@ -77,30 +100,15 @@ public class MealServlet extends HttpServlet {
                 break;
             case "filtered":
                 log.info("filtered");
-                String leftDate = request.getParameter("startDate");
-                LocalDate startDate = leftDate.equals("") ? LocalDate.MIN : LocalDate.parse(leftDate, DateTimeFormatter.ISO_LOCAL_DATE);
-                request.setAttribute("startDate", startDate);
-
-                String rightDate = request.getParameter("endDate");
-                LocalDate endDate = rightDate.equals("") ? LocalDate.MAX : LocalDate.parse(rightDate, DateTimeFormatter.ISO_LOCAL_DATE);
-                request.setAttribute("endDate", endDate);
-
-                String leftTime = request.getParameter("startTime");
-                LocalTime startTime = leftTime.equals("") ? LocalTime.MIN : LocalTime.parse(leftTime, DateTimeFormatter.ofPattern("HH:mm"));
-                request.setAttribute("startTime", startTime);
-
-                String rightTime = request.getParameter("endTime");
-                LocalTime endTime = rightTime.equals("") ? LocalTime.MAX : LocalTime.parse(rightTime, DateTimeFormatter.ofPattern("HH:mm"));
-                request.setAttribute("endTime", endTime);
                 request.setAttribute("meals", mealController.getAllFiltered(startDate, endDate, startTime, endTime));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
+                break;
             case "all":
             default:
                 log.info("getAll");
                 request.setAttribute("meals",
                         mealController.getAll());
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
-                break;
         }
     }
 

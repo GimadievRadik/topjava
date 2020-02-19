@@ -5,14 +5,12 @@ import org.springframework.stereotype.Service;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.to.MealTo;
-import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
-import ru.javawebinar.topjava.util.ValidationUtil;
+import ru.javawebinar.topjava.web.SecurityUtil;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 
@@ -23,7 +21,6 @@ public class MealService {
     private MealRepository repository;
 
     public Meal create(Meal meal, int userId) {
-        ValidationUtil.checkNew(meal);
         return repository.save(meal, userId);
     }
 
@@ -44,8 +41,6 @@ public class MealService {
     }
 
     public List<MealTo> getAllFiltered(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime, int userId, int caloriesPerDay) {
-        return MealsUtil.getTos(repository.getDateFiltered(startDate, endDate, userId), caloriesPerDay).stream()
-                .filter(mealTo -> DateTimeUtil.isBetween(mealTo.getTime(), startTime, endTime))
-                .collect(Collectors.toList());
+        return MealsUtil.getFilteredTos(repository.getDateFiltered(startDate, endDate, userId), SecurityUtil.authUserCaloriesPerDay(), startTime, endTime);
     }
 }

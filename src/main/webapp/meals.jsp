@@ -33,11 +33,11 @@
             </tr>
             </thead>
             <tr>
-                <td><input type="date" name="startDate" value="${startDate}"></td>
-                <td><input type="date" name="endDate" value="${endDate}"></td>
+                <td><input type="date" name="startDate" value="${param.startDate}"></td>
+                <td><input type="date" name="endDate" value="${param.endDate}"></td>
                 <td></td>
-                <td><input type="time" name="startTime" value="${startTime}"></td>
-                <td><input type="time" name="endTime" value="${endTime}"></td>
+                <td><input type="time" name="startTime" value="${param.startTime}"></td>
+                <td><input type="time" name="endTime" value="${param.endTime}"></td>
             </tr>
         </table>
         <button type="submit">Отфильтровать</button>
