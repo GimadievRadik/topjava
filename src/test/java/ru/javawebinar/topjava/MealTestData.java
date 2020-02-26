@@ -20,6 +20,7 @@ public class MealTestData {
 
     public static final Meal ADMIN_MEAL_1 = new Meal(START_SEQ + 9, LocalDateTime.of(2015, Month.JUNE, 1, 14, 0), "Админ ланч", 510);
     public static final Meal ADMIN_MEAL_2 = new Meal(START_SEQ + 10, LocalDateTime.of(2015, Month.JUNE, 1, 21, 0), "Админ ужин", 1500);
+    public static final Meal ADMIN_MEAL_3 = new Meal(START_SEQ + 11, LocalDateTime.of(2015, Month.JUNE, 1, 10, 0), "Админ завтрак", 1000);
 
     public static Meal getAdminsUpdated() {
         Meal meal = new Meal(ADMIN_MEAL_1);
@@ -28,8 +29,13 @@ public class MealTestData {
         return meal;
     }
 
+    public static Meal getNew() {
+        return new Meal(null, LocalDateTime.of(2020, Month.JANUARY, 01, 8, 00),
+                "new meal", 999);
+    }
+
     public static void assertMatch(Meal actual, Meal expected) {
-        assertThat(actual).isEqualToComparingOnlyGivenFields(expected, "dateTime", "description", "calories");
+        assertThat(actual).isEqualToComparingFieldByField(expected);
     }
 
 }
