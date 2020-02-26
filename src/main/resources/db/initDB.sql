@@ -32,6 +32,6 @@ user_id         INTEGER                 NOT NULL,
 date_time       TIMESTAMP DEFAULT now() NOT NULL,
 description     VARCHAR                 NOT NULL,
 calories        INTEGER                 NOT NULL,
-CONSTRAINT meals_date_time_constr UNIQUE (id, date_time),
+CONSTRAINT meals_date_time_constr UNIQUE (date_time),
 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );

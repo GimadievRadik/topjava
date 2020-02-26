@@ -8,46 +8,49 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
-import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 
 @ContextConfiguration({
         "classpath:spring/spring-app.xml",
+        "classpath:spring/spring-jdbc.xml",
         "classpath:spring/spring-db.xml"
 })
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
 
-    private MealRepository repository;
+    private MealService service;
 
     @Autowired
-    public void setRepository(MealRepository repository) {
-        this.repository = repository;
+    public void setService(MealService service) {
+        this.service = service;
+    }
+
+    @Test
+    public void get() throws Exception {
+        Meal meal = service.get(START_SEQ + 2, USER_ID);
+        assertMatch(meal, USER_MEAL_1);
     }
 
     @Test(expected = NotFoundException.class)
-    public void getNotFound() throws Exception {
-        Meal adminMeal = repository.get(START_SEQ + 10, USER_ID);
-        checkNotFoundWithId(adminMeal, START_SEQ + 10);
+    public void getNotFound() {
+        service.get(START_SEQ + 2, ADMIN_ID);
     }
 
     @Test(expected = NotFoundException.class)
-    public void deleteNotFound() throws Exception {
-        checkNotFoundWithId(repository.delete(START_SEQ + 10, USER_ID), START_SEQ + 10);
+    public void deleteNotFound() {
+        service.delete(START_SEQ + 2, ADMIN_ID);
     }
 
     @Test(expected = NotFoundException.class)
-    public void updateNotFound() throws Exception {
-        Meal adminMeal = repository.get(START_SEQ + 10, ADMIN_ID);
-        adminMeal.setDescription("Updated description");
-        Meal updatedMeal = repository.save(adminMeal, USER_ID);
-        checkNotFoundWithId(updatedMeal, adminMeal.getId());
+    public void updateNotFound() {
+        Meal meal = getAdminsUpdated();
+        service.update(meal, USER_ID);
     }
 
 }

@@ -5,6 +5,7 @@ import ru.javawebinar.topjava.model.Meal;
 import java.time.LocalDateTime;
 import java.time.Month;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
 public class MealTestData {
@@ -19,5 +20,16 @@ public class MealTestData {
 
     public static final Meal ADMIN_MEAL_1 = new Meal(START_SEQ + 9, LocalDateTime.of(2015, Month.JUNE, 1, 14, 0), "Админ ланч", 510);
     public static final Meal ADMIN_MEAL_2 = new Meal(START_SEQ + 10, LocalDateTime.of(2015, Month.JUNE, 1, 21, 0), "Админ ужин", 1500);
+
+    public static Meal getAdminsUpdated() {
+        Meal meal = new Meal(ADMIN_MEAL_1);
+        meal.setDescription("Updated admin's meal");
+        meal.setCalories(444);
+        return meal;
+    }
+
+    public static void assertMatch(Meal actual, Meal expected) {
+        assertThat(actual).isEqualToComparingOnlyGivenFields(expected, "dateTime", "description", "calories");
+    }
 
 }
