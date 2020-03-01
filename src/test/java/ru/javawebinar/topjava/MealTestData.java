@@ -30,7 +30,9 @@ public class MealTestData {
     }
 
     public static Meal getUpdated() {
-        return new Meal(MEAL1_ID, MEAL1.getDateTime(), "Обновленный завтрак", 200);
+        Meal meal =  new Meal(MEAL1_ID, MEAL1.getDateTime(), "Обновленный завтрак", 200);
+        meal.setUser(UserTestData.USER);
+        return meal;
     }
 
     public static TestMatcher<Meal> MEAL_MATCHER = TestMatcher.of();
