@@ -22,7 +22,7 @@ public class JpaMealRepository implements MealRepository {
     @Override
     @Transactional
     public Meal save(Meal meal, int userId) {
-        User user = em.find(User.class, userId);
+        User user = em.getReference(User.class, userId);
         if (meal.isNew()) {
             meal.setUser(user);
             em.persist(meal);
@@ -32,7 +32,7 @@ public class JpaMealRepository implements MealRepository {
                     .setParameter("calories", meal.getCalories())
                     .setParameter("date_time", meal.getDateTime())
                     .setParameter("id", meal.getId())
-                    .setParameter("user", user)
+                    .setParameter("user_id", userId)
                     .executeUpdate() == 0) {
                 return null;
             }
@@ -41,27 +41,35 @@ public class JpaMealRepository implements MealRepository {
     }
 
     @Override
+    @Transactional
     public boolean delete(int id, int userId) {
-        return false;
+        return em.createNamedQuery(Meal.DELETE)
+                .setParameter("id", id)
+                .setParameter("user_id", userId)
+                .executeUpdate() != 0;
     }
 
     @Override
     public Meal get(int id, int userId) {
-        User user = em.find(User.class, userId);
+        User user = em.getReference(User.class, userId);
         List<Meal> meals = em.createNamedQuery(Meal.GET, Meal.class)
                 .setParameter("id", id)
-                .setParameter("user", user)
+                .setParameter("user_id", userId)
                 .getResultList();
         return DataAccessUtils.singleResult(meals);
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        return null;
+        return em.createNamedQuery(Meal.GET_ALL, Meal.class).setParameter("user_id", userId).getResultList();
     }
 
     @Override
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-        return null;
+        return em.createNamedQuery(Meal.GET_BETWEEN, Meal.class)
+                .setParameter("user_id", userId)
+                .setParameter("start_date", startDate)
+                .setParameter("end_date", endDate)
+                .getResultList();
     }
 }
