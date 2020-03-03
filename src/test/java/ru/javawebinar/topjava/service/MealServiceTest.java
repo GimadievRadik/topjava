@@ -1,12 +1,11 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestWatcher;
+import org.junit.*;
+import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -20,6 +19,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -37,29 +37,41 @@ public class MealServiceTest {
     private MealService service;
     @Autowired
     private MealRepository repository;
-
+    private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
     private static List<String> actions = new ArrayList<>();
 
     @Rule
-    public TestWatcher watcher = new TestWatcher() {
-        private long startTime;
+    public Stopwatch stopwatch = new Stopwatch() {
 
-        @Override
-        protected void starting(Description description) {
-            startTime = System.currentTimeMillis();
+        private String format(long nanos, Description description) {
+            return String.format("%-24s - %d ms", description.getMethodName(), TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS));
         }
 
         @Override
-        protected void finished(Description description) {
-            String s = String.format("%s test took %d milliseconds", description.getMethodName(), System.currentTimeMillis() - startTime);
-            System.out.println(s);
+        protected void succeeded(long nanos, Description description) {
+            String s = format(nanos, description);
+            log.debug(s);
+            actions.add(s);
+        }
+
+        @Override
+        protected void failed(long nanos, Throwable e, Description description) {
+            String s = format(nanos, description);
+            log.debug(s);
+            actions.add(s);
+        }
+
+        @Override
+        protected void skipped(long nanos, AssumptionViolatedException e, Description description) {
+            String s = format(nanos, description);
+            log.debug(s);
             actions.add(s);
         }
     };
 
     @AfterClass
     public static void printActions() {
-        actions.forEach(System.out::println);
+        actions.forEach(log::debug);
     }
 
     @Test
