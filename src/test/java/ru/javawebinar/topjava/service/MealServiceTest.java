@@ -1,6 +1,9 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
@@ -17,8 +20,6 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -38,40 +39,26 @@ public class MealServiceTest {
     @Autowired
     private MealRepository repository;
     private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
-    private static List<String> actions = new ArrayList<>();
+    private static StringBuilder sb = new StringBuilder();
 
     @Rule
     public Stopwatch stopwatch = new Stopwatch() {
 
         private String format(long nanos, Description description) {
-            return String.format("%-24s - %d ms", description.getMethodName(), TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS));
+            return String.format("%-24s - %d ms%n", description.getMethodName(), TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS));
         }
 
         @Override
-        protected void succeeded(long nanos, Description description) {
+        protected void finished(long nanos, Description description) {
             String s = format(nanos, description);
-            log.debug(s);
-            actions.add(s);
-        }
-
-        @Override
-        protected void failed(long nanos, Throwable e, Description description) {
-            String s = format(nanos, description);
-            log.debug(s);
-            actions.add(s);
-        }
-
-        @Override
-        protected void skipped(long nanos, AssumptionViolatedException e, Description description) {
-            String s = format(nanos, description);
-            log.debug(s);
-            actions.add(s);
+            log.info(s);
+            sb.append(s);
         }
     };
 
     @AfterClass
-    public static void printActions() {
-        actions.forEach(log::debug);
+    public static void printSummary() {
+        log.info(sb.toString());
     }
 
     @Test
