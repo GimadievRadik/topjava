@@ -54,12 +54,12 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
 
     @Test(expected = DataAccessException.class)
     public void duplicateMailCreate() throws Exception {
-        service.create(new User(null, "Duplicate", "user@yandex.ru", "newPass", Role.ROLE_USER));
+        service.create(new User(null, "Duplicate", "admin@gmail.com", "newPass", Role.ROLE_ADMIN, Role.ROLE_USER));
     }
 
     public void delete() throws Exception {
-        service.delete(USER_ID);
-        Assert.assertNull(repository.get(USER_ID));
+        service.delete(ADMIN_ID);
+        Assert.assertNull(repository.get(ADMIN_ID));
     }
 
     @Test(expected = NotFoundException.class)
@@ -69,8 +69,8 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
 
     @Test
     public void get() throws Exception {
-        User user = service.get(USER_ID);
-        USER_MATCHER.assertMatch(user, USER);
+        User user = service.get(ADMIN_ID);
+        USER_MATCHER.assertMatch(user, ADMIN);
     }
 
     @Test(expected = NotFoundException.class)
@@ -80,15 +80,15 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
 
     @Test
     public void getByEmail() throws Exception {
-        User user = service.getByEmail("user@yandex.ru");
-        USER_MATCHER.assertMatch(user, USER);
+        User user = service.getByEmail("admin@gmail.com");
+        USER_MATCHER.assertMatch(user, ADMIN);
     }
 
     @Test
     public void update() throws Exception {
         User updated = getUpdated();
         service.update(updated);
-        USER_MATCHER.assertMatch(service.get(USER_ID), updated);
+        USER_MATCHER.assertMatch(service.get(ADMIN_ID), updated);
     }
 
     @Test
