@@ -2,9 +2,7 @@ package ru.javawebinar.topjava.repository.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -15,7 +13,6 @@ import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -63,13 +60,12 @@ public class JdbcUserRepository implements UserRepository {
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             user.setId(newKey.intValue());
-            jdbcTemplate.batchUpdate(INSERT_ROLES, batchSetter);
         } else if (namedParameterJdbcTemplate.update(UPDATE_USER, parameterSource) != 0) {
             jdbcTemplate.update(DELETE_ROLES, user.getId());
-            jdbcTemplate.batchUpdate(INSERT_ROLES, batchSetter);
         } else {
             return null;
         }
+        jdbcTemplate.batchUpdate(INSERT_ROLES, batchSetter);
         return user;
     }
 
@@ -96,33 +92,31 @@ public class JdbcUserRepository implements UserRepository {
         return jdbcTemplate.query("SELECT * FROM users u LEFT JOIN user_roles r ON u.id = r.user_id ORDER BY name, email", extractor);
     }
 
+    private static final BeanPropertyRowMapper<User> ROW_MAPPER = BeanPropertyRowMapper.newInstance(User.class);
+
+    private RowMapper<User> withRolesMapper = (rs, rowNum) -> {
+        User user = ROW_MAPPER.mapRow(rs, rowNum);
+        user.setRoles(Collections.singletonList(Role.valueOf(rs.getString("role"))));
+        return user;
+    };
+
     private ResultSetExtractor<List<User>> extractor = (rs) -> {
-        Map<User, ArrayList<Role>> map = new HashMap<>();
+        Map<User, ArrayList<Role>> results = new LinkedHashMap<>();
+        int rowNum = 0;
         while (rs.next()) {
-            User user = map(rs);
-            ArrayList<Role> roles = map.get(user);
+            User user = withRolesMapper.mapRow(rs, rowNum++);
+            ArrayList<Role> roles = results.get(user);
             if (roles != null) {
                 roles.addAll(new ArrayList<>(user.getRoles()));
             }
-            map.computeIfAbsent(user, k -> new ArrayList<>()).addAll(user.getRoles());
+            results.computeIfAbsent(user, k -> new ArrayList<>()).addAll(user.getRoles());
         }
-        return map.entrySet().stream().map(e -> {
+        return results.entrySet().stream().map(e -> {
             User user = e.getKey();
             user.setRoles(e.getValue());
             return user;
         }).collect(Collectors.toList());
     };
 
-    private User map(ResultSet rs) throws SQLException {
-        User user = new User();
-        user.setId(rs.getInt("id"));
-        user.setName(rs.getString("name"));
-        user.setEmail(rs.getString("email"));
-        user.setEnabled(rs.getBoolean("enabled"));
-        user.setRegistered(rs.getDate("registered"));
-        user.setPassword(rs.getString("password"));
-        user.setRoles(Collections.singletonList(Role.valueOf(rs.getString("role"))));
-        user.setCaloriesPerDay(rs.getInt("calories_per_day"));
-        return user;
-    }
+
 }

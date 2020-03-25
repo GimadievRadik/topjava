@@ -1,8 +1,5 @@
-package ru.javawebinar.topjava.web;
+package ru.javawebinar.topjava.web.meal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -12,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.MealsUtil;
+import ru.javawebinar.topjava.web.SecurityUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
@@ -25,12 +23,11 @@ import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
 
 @Controller
 @RequestMapping(value = "/meals")
-public class JspMealController {
+public class JspMealController extends AbstractMealController {
 
-    @Autowired
-    MealService service;
-
-    private static final Logger log = LoggerFactory.getLogger(JspMealController.class);
+    public JspMealController(MealService service) {
+        super(service);
+    }
 
     @PostMapping("/create")
     public String create(HttpServletRequest request) {
@@ -57,18 +54,21 @@ public class JspMealController {
         return "meals";
     }
 
-    @GetMapping("/add")
-    public String add(HttpServletRequest request) {
-        String id = request.getParameter("id");
+    @GetMapping("/update")
+    public String update(HttpServletRequest request) {
+        int id = Integer.parseInt(request.getParameter("id"));
         int userId = SecurityUtil.authUserId();
-        final Meal meal;
-        if (id == null) {
-            log.info("create new meal for user {}", userId);
-            meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
-        } else {
-            log.info("update meal for user {}", userId);
-            meal = service.get(Integer.parseInt(id), userId);
-        }
+        log.info("update meal for user {}", userId);
+        final Meal meal = service.get(id, userId);
+        request.setAttribute("meal", meal);
+        return "mealForm";
+    }
+
+    @GetMapping("/create")
+    public String produce(HttpServletRequest request) {
+        int userId = SecurityUtil.authUserId();
+        log.info("create new meal for user {}", userId);
+        final Meal meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
         request.setAttribute("meal", meal);
         return "mealForm";
     }

@@ -4,7 +4,8 @@
 <html>
 <head>
     <title><spring:message code="meal.meal"/></title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
+    <base href="${pageContext.request.contextPath}/"/>
+    <link rel="stylesheet" href="resources/css/style.css">
 </head>
 <jsp:include page="fragments/headTag.jsp"/>
 <body>
@@ -13,8 +14,8 @@
     <h3><a href="index"><spring:message code="meal.homePage"/></a></h3>
     <hr>
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
-    <h2><spring:message code="${meal.id == null ? 'meal.create' : 'meal.update'}"/></h2>
-    <form method="post" action="${pageContext.request.contextPath}/meals/create">
+    <h2><spring:message code="${meal.isNew() ? 'meal.create' : 'meal.update'}"/></h2>
+    <form method="post" action="meals/create">
         <input type="hidden" name="id" value="${meal.id}">
         <dl>
             <dt><spring:message code="meal.dateTime"/></dt>
