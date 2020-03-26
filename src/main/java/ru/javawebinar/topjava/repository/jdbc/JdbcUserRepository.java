@@ -101,15 +101,15 @@ public class JdbcUserRepository implements UserRepository {
     };
 
     private ResultSetExtractor<List<User>> extractor = (rs) -> {
-        Map<User, ArrayList<Role>> results = new LinkedHashMap<>();
+        Map<User, Set<Role>> results = new LinkedHashMap<>();
         int rowNum = 0;
         while (rs.next()) {
             User user = withRolesMapper.mapRow(rs, rowNum++);
-            ArrayList<Role> roles = results.get(user);
+            Set<Role> roles = results.get(user);
             if (roles != null) {
-                roles.addAll(new ArrayList<>(user.getRoles()));
+                roles.addAll(new HashSet<>(user.getRoles()));
             }
-            results.computeIfAbsent(user, k -> new ArrayList<>()).addAll(user.getRoles());
+            results.computeIfAbsent(user, k -> new HashSet<>()).addAll(user.getRoles());
         }
         return results.entrySet().stream().map(e -> {
             User user = e.getKey();
