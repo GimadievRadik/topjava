@@ -90,14 +90,14 @@ class MealRestControllerTest extends AbstractControllerTest {
     @Test
     void getBetween() throws Exception {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+//        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
         LocalDateTime startDatetime = LocalDateTime.of(2020, Month.JANUARY, 30, 0, 0, 0);
         LocalDateTime endDateTime = LocalDateTime.of(2020, Month.JANUARY, 31, 13, 1, 0);
 
-        params.add("startDate", startDatetime.format(formatter));
-        params.add("startTime", startDatetime.format(formatter));
-        params.add("endDate", endDateTime.format(formatter));
-        params.add("endTime", endDateTime.format(formatter));
+        params.add("startDate", startDatetime.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        params.add("startTime", startDatetime.format(DateTimeFormatter.ISO_LOCAL_TIME));
+        params.add("endDate", endDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        params.add("endTime", endDateTime.format(DateTimeFormatter.ISO_LOCAL_TIME));
 
         perform(MockMvcRequestBuilders.get(REST_URL + "filters").params(params))
                 .andDo(print())
