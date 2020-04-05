@@ -6,7 +6,7 @@ function makeEditable(ctx) {
     $(".delete").click(function () {
         if (confirm('Are you sure?')) {
             // deleteRow($(this).attr("id"));
-            deleteRow($(this).parent("td").attr("id"));
+            deleteRow($(this).parents('tr').attr('id'));
         }
     });
 
