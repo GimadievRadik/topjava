@@ -7,14 +7,14 @@ import org.springframework.lang.Nullable;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
-import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import static ru.javawebinar.topjava.util.MealsUtil.*;
+import static ru.javawebinar.topjava.util.MealsUtil.getFilteredTos;
+import static ru.javawebinar.topjava.util.MealsUtil.getTos;
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
 
@@ -49,25 +49,11 @@ public abstract class AbstractMealController {
         return service.create(meal, userId);
     }
 
-    public Meal create(MealTo mealTo) {
-        int userId = SecurityUtil.authUserId();
-        log.info("create from To {} for user {}", mealTo, userId);
-        return service.create(createNewFromTo(mealTo), userId);
-    }
-
     public void update(Meal meal, int id) {
         int userId = SecurityUtil.authUserId();
         assureIdConsistent(meal, id);
         log.info("update {} for user {}", meal, userId);
         service.update(meal, userId);
-    }
-
-    public void update(MealTo mealTo, int id) {
-        int userId = SecurityUtil.authUserId();
-        assureIdConsistent(mealTo, id);
-        log.info("update {} for user {}", mealTo, userId);
-        Meal meal = service.get(mealTo.getId(), userId);
-        service.update(updateFromTo(meal, mealTo), userId);
     }
 
     /**
