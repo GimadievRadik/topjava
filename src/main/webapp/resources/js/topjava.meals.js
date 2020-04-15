@@ -57,8 +57,6 @@ $(function () {
                 $(row).attr("data-mealExcess", data.excess);
             }
         }),
-        updateTable: function () {
-            $.get(mealAjaxUrl, updateTableByData);
-        }
+        updateTable: updateFilteredTable
     });
 });
