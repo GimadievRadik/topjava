@@ -85,4 +85,8 @@ public class ValidationUtil {
                         .collect(Collectors.joining("<br>"))
         );
     }
+
+    public static boolean isMailDuplicate(Throwable e) {
+        return e.toString().contains("users_unique_email_idx");
+    }
 }

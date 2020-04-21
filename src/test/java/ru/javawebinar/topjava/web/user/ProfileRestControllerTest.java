@@ -76,4 +76,16 @@ class ProfileRestControllerTest extends AbstractControllerTest {
 
         USER_MATCHER.assertMatch(userService.get(USER_ID), UserUtil.updateFromTo(new User(USER), updatedTo));
     }
+
+    @Test
+    void updateInvalid() throws Exception {
+        User user = USER;
+        user.setName("");
+        UserTo invalidTo = UserUtil.asTo(user);
+        perform(MockMvcRequestBuilders.put(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(USER))
+                .content(JsonUtil.writeValue(invalidTo)))
+                .andExpect(status().isUnprocessableEntity());
+    }
 }
