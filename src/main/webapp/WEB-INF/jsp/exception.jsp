@@ -13,7 +13,7 @@
         <br>
         <h4 class="my-3">${status}</h4>
         <h2><spring:message code="common.appError"/></h2>
-        <h4 class="my-5"><spring:message code="${emailDuplicate ? 'email.error' : message}"/></h4>
+        <h4 class="my-5">${message}</h4>
     </div>
 </div>
 <!--

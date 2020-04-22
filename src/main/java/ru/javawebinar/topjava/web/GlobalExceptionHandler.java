@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         boolean emailDuplicate = ValidationUtil.isMailDuplicate(rootCause);
         ModelAndView mav = new ModelAndView("exception",
-                Map.of("exception", rootCause, "message", rootCause.toString(), "status", httpStatus, "emailDuplicate", emailDuplicate));
+                Map.of("exception", rootCause, "message", rootCause.toString(), "status", httpStatus));
         mav.setStatus(httpStatus);
 
         // Interceptor is not invoked, put userTo
